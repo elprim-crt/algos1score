@@ -104,7 +104,6 @@ if ($pair_ids) {
         button.plus { color: #fff; background: #4caf50; border: none; padding: 0.3em 1em; cursor: pointer; }
         button.minus { color: #fff; background: #f44336; border: none; padding: 0.3em 1em; cursor: pointer; }
         form.inline { display: inline; }
-        tr.trade-row { display: none; background: #f9f9f9; }
     </style>
 </head>
 <body>
