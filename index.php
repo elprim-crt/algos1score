@@ -32,7 +32,15 @@ try {
 }
 
 // Get selected date
-$selected_date = $_GET['date'] ?? date('Y-m-d');
+$selected_date = date('Y-m-d');
+if (isset($_GET['date'])) {
+    $dt = DateTime::createFromFormat('Y-m-d', $_GET['date']);
+    if ($dt && $dt->format('Y-m-d') === $_GET['date']) {
+        $selected_date = $_GET['date'];
+    } else {
+        $error_message = 'Invalid date provided. Showing today\'s data.';
+    }
+}
 
 // Fetch stats for all pairs
 $pair_ids = array_column($pairs, 'id');
