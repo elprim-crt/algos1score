@@ -31,7 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.querySelectorAll('button.view-trades').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', e => {
+            e.preventDefault();
             const tr = btn.closest('tr');
             const drawer = tr.nextElementSibling;
             const cell = drawer.querySelector('.trades-cell');
