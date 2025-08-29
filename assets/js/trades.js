@@ -42,10 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+
             drawer.style.display = 'table-row';
 
             if (!drawer.dataset.loaded) {
                 cell.textContent = 'Loading…';
+
                 fetch('trades.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
