@@ -42,4 +42,19 @@ class IndexPageTest extends TestCase
         $this->assertMatchesRegularExpression('/<td class="negative">\s*1\s*<\/td>/', $output);
         $this->assertStringContainsString('name="csrf_token" value="'.htmlspecialchars($token, ENT_QUOTES).'"', $output);
     }
+
+    public function testAddingPairCapitalizesName(): void
+    {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST = [
+            'new_pair' => 'ethusd',
+            'csrf_token' => get_csrf_token(),
+        ];
+        ob_start();
+        include __DIR__ . '/../index.php';
+        $output = ob_get_clean();
+        $this->assertStringContainsString('ETHUSD', $output);
+        $stmt = $this->pdo->query("SELECT name FROM pairs WHERE name = 'ETHUSD'");
+        $this->assertSame('ETHUSD', $stmt->fetchColumn());
+    }
 }

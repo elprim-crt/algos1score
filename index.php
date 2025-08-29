@@ -12,18 +12,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_pair'])) {
     if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
         $error_message = 'Invalid CSRF token.';
     } else {
-        $new_pair = trim($_POST['new_pair']);
-        // Validate pair: 1-20 characters, alphanumeric, underscore or hyphen
-        if (!preg_match('/^[A-Za-z0-9_-]{1,20}$/', $new_pair)) {
+        $new_pair = strtoupper(trim($_POST['new_pair']));
+        // Validate pair: 1-20 characters, uppercase alphanumeric, underscore or hyphen
+        if (!preg_match('/^[A-Z0-9_-]{1,20}$/', $new_pair)) {
             $error_message = 'Invalid trading pair. Use 1-20 letters, numbers, hyphens, or underscores.';
         } else {
             try {
                 $pdo = get_db();
-                $stmt = $pdo->prepare("INSERT IGNORE INTO pairs (name) VALUES (?)");
+                $driver = DB_DSN ? explode(':', DB_DSN, 2)[0] : 'mysql';
+                $sql = $driver === 'sqlite'
+                    ? "INSERT OR IGNORE INTO pairs (name) VALUES (?)"
+                    : "INSERT IGNORE INTO pairs (name) VALUES (?)";
+                $stmt = $pdo->prepare($sql);
                 $stmt->execute([$new_pair]);
-                // Redirect to avoid resubmission only on success
-                header("Location: " . strtok($_SERVER['REQUEST_URI'], '?') . (!empty($_GET) ? '?' . http_build_query($_GET) : ''));
-                exit;
+                // Redirect to avoid resubmission only on success when running via web server
+                if (php_sapi_name() !== 'cli') {
+                    header("Location: " . strtok($_SERVER['REQUEST_URI'], '?') . (!empty($_GET) ? '?' . http_build_query($_GET) : ''));
+                    exit;
+                }
             } catch (Exception $e) {
                 debug_log('Error adding pair: ' . $e->getMessage());
                 $error_message = 'Could not add the trading pair. Please try again later.';
@@ -133,7 +139,7 @@ if ($pair_ids) {
                 $neg = $stats[$pid]['negative'] ?? 0;
             ?>
             <tr data-pair-id="<?= (int)$pid ?>">
-                <td><?= htmlspecialchars($pair['name']) ?></td>
+                <td><?= htmlspecialchars(strtoupper($pair['name'])) ?></td>
                 <td class="positive"><?= $pos ?></td>
                 <td class="negative"><?= $neg ?></td>
                 <td>
