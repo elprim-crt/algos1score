@@ -104,7 +104,7 @@ if ($pair_ids) {
         button.plus { color: #fff; background: #4caf50; border: none; padding: 0.3em 1em; cursor: pointer; }
         button.minus { color: #fff; background: #f44336; border: none; padding: 0.3em 1em; cursor: pointer; }
         form.inline { display: inline; }
-        tr.drawer { display: none; background: #f9f9f9; }
+        tr.trade-row { display: none; background: #f9f9f9; }
     </style>
 </head>
 <body>
@@ -148,9 +148,6 @@ if ($pair_ids) {
                     <button class="minus" data-type="negative">-</button>
                     <button class="view-trades">Trades</button>
                 </td>
-            </tr>
-            <tr class="drawer">
-                <td colspan="4" class="trades-cell"></td>
             </tr>
             <?php endforeach ?>
         </tbody>
