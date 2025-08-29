@@ -1,43 +1,59 @@
 <?php
 require_once 'db.php';
 
+$error_message = null;
+
 // Handle add new pair form submission (POST with normal form, not AJAX)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_pair'])) {
     $new_pair = trim($_POST['new_pair']);
     if ($new_pair !== '') {
-        $pdo = get_db();
-        $stmt = $pdo->prepare("INSERT IGNORE INTO pairs (pair) VALUES (?)");
-        $stmt->execute([$new_pair]);
+        try {
+            $pdo = get_db();
+            $stmt = $pdo->prepare("INSERT IGNORE INTO pairs (pair) VALUES (?)");
+            $stmt->execute([$new_pair]);
+            // Redirect to avoid resubmission only on success
+            header("Location: " . strtok($_SERVER['REQUEST_URI'], '?') . '?' . http_build_query($_GET));
+            exit;
+        } catch (Exception $e) {
+            debug_log('Error adding pair: ' . $e->getMessage());
+            $error_message = 'Could not add the trading pair. Please try again later.';
+        }
     }
-    // Redirect to avoid resubmission
-    header("Location: " . strtok($_SERVER['REQUEST_URI'], '?') . '?' . http_build_query($_GET));
-    exit;
 }
 
 // Fetch trading pairs from DB
-$pdo = get_db();
-$pairs = $pdo->query("SELECT * FROM pairs ORDER BY pair ASC")->fetchAll();
+$pairs = [];
+try {
+    $pdo = get_db();
+    $pairs = $pdo->query("SELECT * FROM pairs ORDER BY pair ASC")->fetchAll();
+} catch (Exception $e) {
+    debug_log('Error fetching pairs: ' . $e->getMessage());
+    $error_message = $error_message ?? 'An error occurred while retrieving data. Please try again later.';
+}
 
 // Get selected date
 $selected_date = $_GET['date'] ?? date('Y-m-d');
 
 // Fetch stats for all pairs
 $pair_ids = array_column($pairs, 'id');
+$stats = [];
 if ($pair_ids) {
     $in = implode(',', array_fill(0, count($pair_ids), '?'));
-    $stmt = $pdo->prepare("SELECT pair_id, \
+    try {
+        $stmt = $pdo->prepare("SELECT pair_id, \
         SUM(type='positive') as positive, \
         SUM(type='negative') as negative \
         FROM trades \
         WHERE pair_id IN ($in) AND date BETWEEN DATE_SUB(?, INTERVAL 13 DAY) AND ? \
         GROUP BY pair_id");
-    $stmt->execute(array_merge($pair_ids, [$selected_date, $selected_date]));
-    $stats = [];
-    foreach ($stmt as $row) {
-        $stats[$row['pair_id']] = $row;
+        $stmt->execute(array_merge($pair_ids, [$selected_date, $selected_date]));
+        foreach ($stmt as $row) {
+            $stats[$row['pair_id']] = $row;
+        }
+    } catch (Exception $e) {
+        debug_log('Error fetching stats: ' . $e->getMessage());
+        $error_message = $error_message ?? 'An error occurred while retrieving data. Please try again later.';
     }
-} else {
-    $stats = [];
 }
 ?>
 <!DOCTYPE html>
@@ -56,6 +72,9 @@ if ($pair_ids) {
 </head>
 <body>
     <h2>Trading Pairs - Last 14 Days</h2>
+    <?php if ($error_message): ?>
+        <p style="color:red;"><?= htmlspecialchars($error_message) ?></p>
+    <?php endif; ?>
     <form id="dateForm" method="get">
         <label for="date">Select Date:</label>
         <input type="date" name="date" id="date" value="<?= htmlspecialchars($selected_date) ?>" max="<?= date('Y-m-d') ?>">
