@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_pair'])) {
             $stmt = $pdo->prepare("INSERT IGNORE INTO pairs (name) VALUES (?)");
             $stmt->execute([$new_pair]);
             // Redirect to avoid resubmission only on success
-            header("Location: " . strtok($_SERVER['REQUEST_URI'], '?') . '?' . http_build_query($_GET));
+            header("Location: " . strtok($_SERVER['REQUEST_URI'], '?') . (!empty($_GET) ? '?' . http_build_query($_GET) : ''));
             exit;
         } catch (Exception $e) {
             debug_log('Error adding pair: ' . $e->getMessage());
