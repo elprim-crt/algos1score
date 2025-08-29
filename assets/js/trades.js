@@ -34,52 +34,64 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', e => {
             e.preventDefault();
             const tr = btn.closest('tr');
-            const drawer = tr.nextElementSibling;
-            const cell = drawer.querySelector('.trades-cell');
             const pair_id = tr.getAttribute('data-pair-id');
             const date = document.getElementById('date').value;
 
-            if (drawer.style.display === 'table-row') {
-                drawer.style.display = 'none';
+            const tradeRows = [];
+            let next = tr.nextElementSibling;
+            while (next && next.classList.contains('trade-row')) {
+                tradeRows.push(next);
+                next = next.nextElementSibling;
+            }
+
+            if (tradeRows.length > 0) {
+                const hidden = tradeRows[0].style.display === 'none';
+                tradeRows.forEach(row => {
+                    row.style.display = hidden ? 'table-row' : 'none';
+                });
                 return;
             }
 
-            drawer.style.display = 'table-row';
-
-            if (!drawer.dataset.loaded) {
-                cell.textContent = 'Loading…';
-
-                fetch('trades.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'list', pair_id, date, csrf_token: csrfToken }),
-                    credentials: 'same-origin'
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        if (data.trades.length === 0) {
-                            cell.textContent = 'No trades in this period.';
-                        } else {
-                            const ul = document.createElement('ul');
-                            data.trades.forEach(t => {
-                                const li = document.createElement('li');
-                                li.textContent = `${t.date} - ${t.type}`;
-                                ul.appendChild(li);
-                            });
-                            cell.innerHTML = '';
-                            cell.appendChild(ul);
-                        }
-                        drawer.dataset.loaded = 'true';
+            fetch('trades.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'list', pair_id, date, csrf_token: csrfToken }),
+                credentials: 'same-origin'
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const tbody = tr.parentNode;
+                    const insertBefore = tr.nextSibling;
+                    if (data.trades.length === 0) {
+                        const row = document.createElement('tr');
+                        row.className = 'trade-row';
+                        const cell = document.createElement('td');
+                        cell.colSpan = 4;
+                        cell.textContent = 'No trades in this period.';
+                        row.appendChild(cell);
+                        tbody.insertBefore(row, insertBefore);
+                        row.style.display = 'table-row';
                     } else {
-                        cell.textContent = 'Error: ' + data.error;
+                        data.trades.forEach(t => {
+                            const row = document.createElement('tr');
+                            row.className = 'trade-row';
+                            const cell = document.createElement('td');
+                            cell.colSpan = 4;
+                            cell.textContent = `${t.date} - ${t.type}`;
+                            row.appendChild(cell);
+                            tbody.insertBefore(row, insertBefore);
+                            row.style.display = 'table-row';
+                        });
                     }
-                })
-                .catch(err => {
-                    console.error('Fetch error:', err);
-                    cell.textContent = 'An error occurred while communicating with the server. Please try again later.';
-                });
-            }
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(err => {
+                console.error('Fetch error:', err);
+                alert('An error occurred while communicating with the server. Please try again later.');
+            });
         });
     });
 });
