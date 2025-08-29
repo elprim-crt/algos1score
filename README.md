@@ -12,7 +12,8 @@ A lightweight PHP-based backend for recording and reporting trades with positive
 ## Files
 
 - `config.php` – Database connection configuration.
-- `db.php` – PDO-based database connection handler.
+- `db.php` – PDO-based database connection handler. Use `get_db()` for a
+  connection and `close_db()` to release it when you're done.
 - `trades.php` – Main endpoint for adding trades and reporting.
   
 ## API Usage
@@ -88,6 +89,18 @@ DB_PASS=your_db_password
 ```
 
 If you're using [vlucas/phpdotenv](https://github.com/vlucas/phpdotenv), copy `.env.example` to `.env` and adjust the values as needed.
+
+## Closing the Database Connection
+
+Use `close_db()` when your script is finished with the database or after
+long-running tasks to explicitly release the PDO connection. A subsequent call
+to `get_db()` will create a new connection if needed.
+
+```php
+$pdo = get_db();
+// ... work with the database ...
+close_db(); // typically at script shutdown or after a long-running job
+```
 
 ## Debug Logging
 
