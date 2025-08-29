@@ -60,4 +60,31 @@ class TradesApiTest extends TestCase
         $this->assertTrue($duplicate['success']);
         $this->assertSame(2, $duplicate['count']);
     }
+
+    public function testListTrades(): void
+    {
+        $payload = [
+            'action' => 'add',
+            'pair_id' => 1,
+            'type' => 'positive',
+            'date' => '2024-01-01',
+            'csrf_token' => $this->csrfToken,
+        ];
+        handle_trades($payload);
+        $payload['type'] = 'negative';
+        handle_trades($payload);
+
+        $list = handle_trades([
+            'action' => 'list',
+            'pair_id' => 1,
+            'date' => '2024-01-01',
+            'csrf_token' => $this->csrfToken,
+        ]);
+
+        $this->assertTrue($list['success']);
+        $this->assertCount(2, $list['trades']);
+        $types = array_column($list['trades'], 'type');
+        $this->assertContains('positive', $types);
+        $this->assertContains('negative', $types);
+    }
 }
