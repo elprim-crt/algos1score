@@ -9,5 +9,6 @@ CREATE TABLE IF NOT EXISTS trades (
     date DATE NOT NULL,
     type ENUM('positive', 'negative') NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (pair_id) REFERENCES pairs(id) ON DELETE CASCADE
+    FOREIGN KEY (pair_id) REFERENCES pairs(id) ON DELETE CASCADE,
+    UNIQUE KEY uniq_pair_date_type (pair_id, date, type)
 );
