@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+const init = () => {
     const csrfInput = document.querySelector('#addPairForm input[name="csrf_token"]');
     const csrfToken = csrfInput ? csrfInput.value : '';
 
@@ -55,4 +55,11 @@ document.addEventListener('DOMContentLoaded', () => {
             link.href = `trades_view.php?pair_id=${encodeURIComponent(pair_id)}&date=${encodeURIComponent(date)}`;
         });
     });
-});
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
+
