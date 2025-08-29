@@ -1,22 +1,28 @@
 <?php
 require_once 'db.php';
+require_once 'csrf.php';
 
 $error_message = null;
+$csrf_token = get_csrf_token();
 
 // Handle add new pair form submission (POST with normal form, not AJAX)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_pair'])) {
-    $new_pair = trim($_POST['new_pair']);
-    if ($new_pair !== '') {
-        try {
-            $pdo = get_db();
-            $stmt = $pdo->prepare("INSERT IGNORE INTO pairs (name) VALUES (?)");
-            $stmt->execute([$new_pair]);
-            // Redirect to avoid resubmission only on success
-            header("Location: " . strtok($_SERVER['REQUEST_URI'], '?') . (!empty($_GET) ? '?' . http_build_query($_GET) : ''));
-            exit;
-        } catch (Exception $e) {
-            debug_log('Error adding pair: ' . $e->getMessage());
-            $error_message = 'Could not add the trading pair. Please try again later.';
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        $error_message = 'Invalid CSRF token.';
+    } else {
+        $new_pair = trim($_POST['new_pair']);
+        if ($new_pair !== '') {
+            try {
+                $pdo = get_db();
+                $stmt = $pdo->prepare("INSERT IGNORE INTO pairs (name) VALUES (?)");
+                $stmt->execute([$new_pair]);
+                // Redirect to avoid resubmission only on success
+                header("Location: " . strtok($_SERVER['REQUEST_URI'], '?') . (!empty($_GET) ? '?' . http_build_query($_GET) : ''));
+                exit;
+            } catch (Exception $e) {
+                debug_log('Error adding pair: ' . $e->getMessage());
+                $error_message = 'Could not add the trading pair. Please try again later.';
+            }
         }
     }
 }
@@ -91,6 +97,7 @@ if ($pair_ids) {
     <br>
     <form method="post" class="inline" id="addPairForm" autocomplete="off">
         <input type="text" name="new_pair" id="new_pair" placeholder="Add new trading pair" maxlength="20" required>
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
         <button type="submit">Add Pair</button>
     </form>
     <br><br>
@@ -122,6 +129,7 @@ if ($pair_ids) {
         </tbody>
     </table>
     <script>
+        const csrfToken = '<?= $csrf_token ?>';
         document.querySelectorAll('button.plus, button.minus').forEach(function(btn){
             btn.addEventListener('click', function(e){
                 e.preventDefault();
@@ -132,7 +140,7 @@ if ($pair_ids) {
                 fetch('trades.php', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ action: 'add', pair_id, type, date })
+                    body: JSON.stringify({ action: 'add', pair_id, type, date, csrf_token: csrfToken })
                 }).then(r => r.json()).then(data => {
                     if (data.success) {
                         tr.querySelector('.' + type).textContent = data.count;

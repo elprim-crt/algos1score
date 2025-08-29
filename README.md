@@ -7,6 +7,7 @@ A lightweight PHP-based backend for recording and reporting trades with positive
 - **Add Trades:** Record trades for specific pairs with type (`positive` or `negative`) and date.
 - **14-Day Reporting:** Get the count of positive or negative trades per pair for the last 14 days.
 - **RESTful API:** Simple POST-based API for integration.
+- **CSRF Protection:** All POST requests require a valid CSRF token stored in the user session.
 
 ## Files
 
@@ -27,7 +28,8 @@ A lightweight PHP-based backend for recording and reporting trades with positive
   "action": "add",
   "pair_id": 1,
   "type": "positive",
-  "date": "2025-08-29"
+  "date": "2025-08-29",
+  "csrf_token": "<token from session>"
 }
 ```
 
@@ -49,6 +51,10 @@ Error responses will include `success: false` and an error message:
   "error": "Invalid pair_id"
 }
 ```
+
+## CSRF Tokens
+
+Every POST request must include a `csrf_token` value that matches the token stored in the current session. The main page embeds this token in the "Add Pair" form and exposes it to JavaScript for API calls.
 
 ## Database Setup
 
