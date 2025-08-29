@@ -29,11 +29,15 @@ class TradesApiTest extends TestCase
         session_destroy();
     }
 
-    public function testMissingAction(): void
+    public function testMissingOrMalformedBody(): void
     {
+        $response = handle_trades(null);
+        $this->assertFalse($response['success']);
+        $this->assertSame('Malformed or missing request body', $response['error']);
+
         $response = handle_trades(['csrf_token' => $this->csrfToken]);
         $this->assertFalse($response['success']);
-        $this->assertSame('No action specified', $response['error']);
+        $this->assertSame('Malformed or missing request body', $response['error']);
     }
 
     public function testInvalidCsrfToken(): void

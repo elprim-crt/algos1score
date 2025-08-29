@@ -14,9 +14,9 @@ use function App\Debug\debug_log;
 function handle_trades(?array $data): array {
     debug_log(['request' => $data]);
 
-    if (!isset($data['action'])) {
-        debug_log('No action specified');
-        return ['success' => false, 'error' => 'No action specified'];
+    if (!is_array($data) || !isset($data['action'])) {
+        debug_log('Malformed or missing request body');
+        return ['success' => false, 'error' => 'Malformed or missing request body'];
     }
 
     if (!validate_csrf_token($data['csrf_token'] ?? '')) {
