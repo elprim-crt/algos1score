@@ -91,12 +91,15 @@ If you're using [vlucas/phpdotenv](https://github.com/vlucas/phpdotenv), copy `.
 
 ## Debug Logging
 
-`debug.php` provides a `debug_log()` helper that writes messages to `debug.log` in the project root. Each entry in the log includes a timestamp.
+The `App\Debug\debug_log()` helper writes messages to `debug.log` in the project root. Each entry includes a timestamp.
 
 To record a message:
 
 ```php
-require 'debug.php';
+require 'autoload.php';
+
+use function App\Debug\debug_log;
+
 debug_log('Something happened');
 ```
 

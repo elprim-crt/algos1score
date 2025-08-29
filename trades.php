@@ -1,7 +1,9 @@
 <?php
-require_once 'db.php';
-require_once 'debug.php';
-require_once 'csrf.php';
+require_once __DIR__ . '/autoload.php';
+require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/csrf.php';
+
+use function App\Debug\debug_log;
 
 header('Content-Type: application/json');
 

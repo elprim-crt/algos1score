@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/debug.php';
+require_once __DIR__ . '/autoload.php';
+
+use function App\Debug\debug_log;
 
 function get_db() {
     static $pdo;
