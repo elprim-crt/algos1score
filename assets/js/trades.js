@@ -3,7 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const csrfToken = csrfInput ? csrfInput.value : '';
 
     const updateCellColor = (td) => {
-        const value = parseInt(td.textContent, 10) || 0;
+        const raw = td.textContent.trim();
+        const match = raw.match(/-?\d+(\.\d+)?/);
+        const value = match ? parseFloat(match[0]) : 0;
         const percent = Math.min(value, 10) * 10;
         const color = td.classList.contains('positive')
             ? 'rgba(76, 175, 80, 0.5)'
