@@ -78,13 +78,16 @@ CREATE TABLE IF NOT EXISTS trades (
 
 ## Configuration
 
-Update `config.php` with your database credentials:
-```php
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'algos1score');
-define('DB_USER', 'your_db_user');
-define('DB_PASS', 'your_db_password');
+Database credentials are read from environment variables. Set the following values in your environment or in a `.env` file:
+
+```bash
+DB_HOST=localhost
+DB_NAME=algos1score
+DB_USER=your_db_user
+DB_PASS=your_db_password
 ```
+
+If you're using [vlucas/phpdotenv](https://github.com/vlucas/phpdotenv), copy `.env.example` to `.env` and adjust the values as needed.
 
 ## Debug Logging
 
