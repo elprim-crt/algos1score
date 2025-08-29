@@ -104,7 +104,6 @@ if ($pair_ids) {
         button.plus { color: #fff; background: #4caf50; border: none; padding: 0.3em 1em; cursor: pointer; }
         button.minus { color: #fff; background: #f44336; border: none; padding: 0.3em 1em; cursor: pointer; }
         form.inline { display: inline; }
-        td.pair-name { cursor: pointer; color: #1a0dab; text-decoration: underline; }
         tr.drawer { display: none; background: #f9f9f9; }
     </style>
 </head>
@@ -147,6 +146,7 @@ if ($pair_ids) {
                 <td>
                     <button class="plus" data-type="positive">+</button>
                     <button class="minus" data-type="negative">-</button>
+                    <button class="view-trades">Trades</button>
                 </td>
             </tr>
             <tr class="drawer">

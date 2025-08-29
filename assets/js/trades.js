@@ -29,9 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.querySelectorAll('td.pair-name').forEach(td => {
-        td.addEventListener('click', () => {
-            const tr = td.parentElement;
+    document.querySelectorAll('button.view-trades').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tr = btn.closest('tr');
             const drawer = tr.nextElementSibling;
             const cell = drawer.querySelector('.trades-cell');
             const pair_id = tr.getAttribute('data-pair-id');
@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 drawer.style.display = 'none';
                 return;
             }
-
 
             drawer.style.display = 'table-row';
 
