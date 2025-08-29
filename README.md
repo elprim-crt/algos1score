@@ -55,17 +55,18 @@ Error responses will include `success: false` and an error message:
 You need two tables: `pairs` (for trade pairs) and `trades` (for trade entries).
 
 ```sql
-CREATE TABLE pairs (
+CREATE TABLE IF NOT EXISTS pairs (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(64) NOT NULL
+  pair VARCHAR(20) NOT NULL UNIQUE
 );
 
-CREATE TABLE trades (
+CREATE TABLE IF NOT EXISTS trades (
   id INT AUTO_INCREMENT PRIMARY KEY,
   pair_id INT NOT NULL,
   date DATE NOT NULL,
   type ENUM('positive', 'negative') NOT NULL,
-  FOREIGN KEY (pair_id) REFERENCES pairs(id)
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (pair_id) REFERENCES pairs(id) ON DELETE CASCADE
 );
 ```
 
