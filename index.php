@@ -145,7 +145,7 @@ if ($pair_ids) {
                 <td>
                     <button class="plus" data-type="positive">+</button>
                     <button class="minus" data-type="negative">-</button>
-                    <button class="view-trades">Trades</button>
+                    <a class="view-trades" href="<?= htmlspecialchars('trades_view.php?pair_id=' . (int)$pid . '&date=' . $selected_date) ?>">Trades</a>
                 </td>
             </tr>
             <?php endforeach ?>
