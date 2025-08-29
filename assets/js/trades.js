@@ -12,7 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
             fetch('trades.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ action: 'add', pair_id, type, date, csrf_token: csrfToken })
+                body: JSON.stringify({ action: 'add', pair_id, type, date, csrf_token: csrfToken }),
+                credentials: 'same-origin'
             })
             .then(r => r.json())
             .then(data => {
@@ -50,7 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 fetch('trades.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'list', pair_id, date, csrf_token: csrfToken })
+                    body: JSON.stringify({ action: 'list', pair_id, date, csrf_token: csrfToken }),
+                    credentials: 'same-origin'
                 })
                 .then(r => r.json())
                 .then(data => {
