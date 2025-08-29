@@ -104,6 +104,8 @@ if ($pair_ids) {
         button.plus { color: #fff; background: #4caf50; border: none; padding: 0.3em 1em; cursor: pointer; }
         button.minus { color: #fff; background: #f44336; border: none; padding: 0.3em 1em; cursor: pointer; }
         form.inline { display: inline; }
+        td.pair-name { cursor: pointer; color: #1a0dab; text-decoration: underline; }
+        tr.drawer { display: none; background: #f9f9f9; }
     </style>
 </head>
 <body>
@@ -133,19 +135,22 @@ if ($pair_ids) {
             </tr>
         </thead>
         <tbody id="pairsTable">
-            <?php foreach ($pairs as $pair): 
+            <?php foreach ($pairs as $pair):
                 $pid = $pair['id'];
                 $pos = $stats[$pid]['positive'] ?? 0;
                 $neg = $stats[$pid]['negative'] ?? 0;
             ?>
-            <tr data-pair-id="<?= (int)$pid ?>">
-                <td><?= htmlspecialchars(strtoupper($pair['name'])) ?></td>
+            <tr data-pair-id="<?= (int)$pid ?>" class="pair-row">
+                <td class="pair-name"><?= htmlspecialchars(strtoupper($pair['name'])) ?></td>
                 <td class="positive"><?= $pos ?></td>
                 <td class="negative"><?= $neg ?></td>
                 <td>
                     <button class="plus" data-type="positive">+</button>
                     <button class="minus" data-type="negative">-</button>
                 </td>
+            </tr>
+            <tr class="drawer">
+                <td colspan="4" class="trades-cell"></td>
             </tr>
             <?php endforeach ?>
         </tbody>

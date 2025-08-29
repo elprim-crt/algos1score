@@ -75,6 +75,39 @@ function handle_trades(?array $data): array {
         }
     }
 
+    if ($data['action'] === 'list') {
+        try {
+            $pair_id = (int)($data['pair_id'] ?? 0);
+            $date = $data['date'];
+
+            // Validate pair_id
+            $stmt = $pdo->prepare("SELECT id FROM pairs WHERE id = ?");
+            $stmt->execute([$pair_id]);
+            if (!$stmt->fetchColumn()) {
+                debug_log("Invalid pair_id: $pair_id");
+                return ['success' => false, 'error' => 'Invalid pair_id'];
+            }
+
+            $driver = DB_DSN ? explode(':', DB_DSN, 2)[0] : 'mysql';
+            if ($driver === 'sqlite') {
+                $sql = "SELECT date, type FROM trades WHERE pair_id = ? " .
+                    "AND date BETWEEN date(?, '-13 day') AND ? ORDER BY date DESC, id DESC";
+            } else {
+                $sql = "SELECT date, type FROM trades WHERE pair_id = ? " .
+                    "AND date BETWEEN DATE_SUB(?, INTERVAL 13 DAY) AND ? ORDER BY date DESC, id DESC";
+            }
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$pair_id, $date, $date]);
+            $trades = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return ['success' => true, 'trades' => $trades];
+        } catch (Exception $e) {
+            debug_log('Error fetching trades: ' . $e->getMessage());
+            return ['success' => false, 'error' => 'Database error. Please try again later.'];
+        }
+    }
+
     debug_log('Unknown action: ' . $data['action']);
     return ['success' => false, 'error' => 'Unknown action'];
 }
