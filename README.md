@@ -80,6 +80,31 @@ define('DB_USER', 'your_db_user');
 define('DB_PASS', 'your_db_password');
 ```
 
+## Debug Logging
+
+`debug.php` provides a `debug_log()` helper that writes messages to `debug.log` in the project root. Each entry in the log includes a timestamp.
+
+To record a message:
+
+```php
+require 'debug.php';
+debug_log('Something happened');
+```
+
+To watch log output in real time:
+
+```bash
+tail -f debug.log
+```
+
+Each log entry looks like:
+
+```
+[2025-08-30 12:34:56] Something happened
+```
+
+Use these timestamps and messages to trace application flow and troubleshoot issues.
+
 ## License
 
 MIT License
