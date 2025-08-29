@@ -52,16 +52,8 @@ function handle_trades(?array $data): array {
 
             // Insert trade
             $stmt = $pdo->prepare("INSERT INTO trades (pair_id, date, type) VALUES (?, ?, ?)");
-            try {
-                $stmt->execute([$pair_id, $date, $type]);
-                debug_log("Inserted trade pair_id=$pair_id type=$type date=$date");
-            } catch (PDOException $e) {
-                if ($e->getCode() === '23000') { // Unique constraint violation
-                    debug_log("Duplicate trade pair_id=$pair_id type=$type date=$date");
-                    return ['success' => false, 'error' => 'Trade already exists for this pair, date, and type'];
-                }
-                throw $e;
-            }
+            $stmt->execute([$pair_id, $date, $type]);
+            debug_log("Inserted trade pair_id=$pair_id type=$type date=$date");
 
             // Return updated count for this type and pair in the last 14 days
             $driver = DB_DSN ? explode(':', DB_DSN, 2)[0] : 'mysql';
