@@ -1,6 +1,7 @@
 <?php
 require_once 'db.php';
 require_once 'debug.php';
+require_once 'csrf.php';
 
 header('Content-Type: application/json');
 
@@ -10,6 +11,12 @@ debug_log(['request' => $data]);
 if (!isset($data['action'])) {
     debug_log('No action specified');
     echo json_encode(['success' => false, 'error' => 'No action specified']);
+    exit;
+}
+
+if (!validate_csrf_token($data['csrf_token'] ?? '')) {
+    debug_log('Invalid CSRF token');
+    echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
     exit;
 }
 
