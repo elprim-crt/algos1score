@@ -1,11 +1,14 @@
 <?php
 require_once 'db.php';
+require_once 'debug.php';
 
 header('Content-Type: application/json');
 
-data = json_decode(file_get_contents('php://input'), true);
+$data = json_decode(file_get_contents('php://input'), true);
+debug_log(['request' => $data]);
 
 if (!isset($data['action'])) {
+    debug_log('No action specified');
     echo json_encode(['success' => false, 'error' => 'No action specified']);
     exit;
 }
@@ -21,11 +24,13 @@ if ($data['action'] === 'add') {
     $stmt = $pdo->prepare("SELECT id FROM pairs WHERE id = ?");
     $stmt->execute([$pair_id]);
     if (!$stmt->fetchColumn()) {
+        debug_log("Invalid pair_id: $pair_id");
         echo json_encode(['success' => false, 'error' => 'Invalid pair_id']);
         exit;
     }
 
     if (!in_array($type, ['positive', 'negative'])) {
+        debug_log("Invalid type: $type");
         echo json_encode(['success' => false, 'error' => 'Invalid type']);
         exit;
     }
@@ -33,9 +38,13 @@ if ($data['action'] === 'add') {
     // Insert trade
     $stmt = $pdo->prepare("INSERT INTO trades (pair_id, date, type) VALUES (?, ?, ?)");
     $stmt->execute([$pair_id, $date, $type]);
+    debug_log("Inserted trade pair_id=$pair_id type=$type date=$date");
 
     // Return updated count for this type and pair in the last 14 days
-    $stmt2 = $pdo->prepare("SELECT COUNT(*) FROM trades WHERE pair_id = ? AND type = ? AND date BETWEEN DATE_SUB(?, INTERVAL 13 DAY) AND ?");
+    $stmt2 = $pdo->prepare(
+        "SELECT COUNT(*) FROM trades WHERE pair_id = ? AND type = ? " .
+        "AND date BETWEEN DATE_SUB(?, INTERVAL 13 DAY) AND ?"
+    );
     $stmt2->execute([$pair_id, $type, $date, $date]);
     $count = $stmt2->fetchColumn();
 
@@ -43,4 +52,5 @@ if ($data['action'] === 'add') {
     exit;
 }
 
+debug_log('Unknown action: ' . $data['action']);
 echo json_encode(['success' => false, 'error' => 'Unknown action']);
