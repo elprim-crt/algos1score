@@ -57,7 +57,7 @@ You need two tables: `pairs` (for trade pairs) and `trades` (for trade entries).
 ```sql
 CREATE TABLE IF NOT EXISTS pairs (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  pair VARCHAR(20) NOT NULL UNIQUE
+  name VARCHAR(20) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS trades (

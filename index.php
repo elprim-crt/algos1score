@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_pair'])) {
     if ($new_pair !== '') {
         try {
             $pdo = get_db();
-            $stmt = $pdo->prepare("INSERT IGNORE INTO pairs (pair) VALUES (?)");
+            $stmt = $pdo->prepare("INSERT IGNORE INTO pairs (name) VALUES (?)");
             $stmt->execute([$new_pair]);
             // Redirect to avoid resubmission only on success
             header("Location: " . strtok($_SERVER['REQUEST_URI'], '?') . '?' . http_build_query($_GET));
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_pair'])) {
 $pairs = [];
 try {
     $pdo = get_db();
-    $pairs = $pdo->query("SELECT * FROM pairs ORDER BY pair ASC")->fetchAll();
+    $pairs = $pdo->query("SELECT * FROM pairs ORDER BY name ASC")->fetchAll();
 } catch (Exception $e) {
     debug_log('Error fetching pairs: ' . $e->getMessage());
     $error_message = $error_message ?? 'An error occurred while retrieving data. Please try again later.';
@@ -102,7 +102,7 @@ if ($pair_ids) {
                 $neg = $stats[$pid]['negative'] ?? 0;
             ?>
             <tr data-pair-id="<?= (int)$pid ?>">
-                <td><?= htmlspecialchars($pair['pair']) ?></td>
+                <td><?= htmlspecialchars($pair['name']) ?></td>
                 <td class="positive"><?= $pos ?></td>
                 <td class="negative"><?= $neg ?></td>
                 <td>
