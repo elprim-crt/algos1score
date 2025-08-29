@@ -17,4 +17,4 @@ spl_autoload_register(function ($class) {
 });
 
 // Include namespaced function libraries
-require_once __DIR__ . '/src/Debug/debug.php';
+require_once __DIR__ . '/src/debug/debug.php';
