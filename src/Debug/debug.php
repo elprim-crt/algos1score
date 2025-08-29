@@ -1,11 +1,14 @@
 <?php
+
+namespace App\Debug;
+
 /**
  * Simple file-based debug logger.
  *
  * Writes messages to debug.log in the project root with a timestamp.
  */
 function debug_log($message): void {
-    $logFile = __DIR__ . '/debug.log';
+    $logFile = dirname(__DIR__, 2) . '/debug.log';
     $timestamp = date('Y-m-d H:i:s');
     if (is_array($message) || is_object($message)) {
         $message = print_r($message, true);

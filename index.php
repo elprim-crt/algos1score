@@ -2,6 +2,8 @@
 require_once 'db.php';
 require_once 'csrf.php';
 
+use function App\Debug\debug_log;
+
 $error_message = null;
 $csrf_token = get_csrf_token();
 
