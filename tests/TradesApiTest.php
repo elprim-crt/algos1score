@@ -91,4 +91,27 @@ class TradesApiTest extends TestCase
         $this->assertContains('positive', $types);
         $this->assertContains('negative', $types);
     }
+
+    public function testRemoveTrade(): void
+    {
+        $payload = [
+            'action' => 'add',
+            'pair_id' => 1,
+            'type' => 'positive',
+            'date' => '2024-01-01',
+            'csrf_token' => $this->csrfToken,
+        ];
+        handle_trades($payload);
+        $id = (int)$this->pdo->query('SELECT id FROM trades LIMIT 1')->fetchColumn();
+
+        $response = handle_trades([
+            'action' => 'remove',
+            'id' => $id,
+            'csrf_token' => $this->csrfToken,
+        ]);
+
+        $this->assertTrue($response['success']);
+        $count = (int)$this->pdo->query('SELECT COUNT(*) FROM trades')->fetchColumn();
+        $this->assertSame(0, $count);
+    }
 }

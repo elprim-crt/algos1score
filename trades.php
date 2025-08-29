@@ -90,10 +90,10 @@ function handle_trades(?array $data): array {
 
             $driver = DB_DSN ? explode(':', DB_DSN, 2)[0] : 'mysql';
             if ($driver === 'sqlite') {
-                $sql = "SELECT date, type FROM trades WHERE pair_id = ? " .
+                $sql = "SELECT id, date, type FROM trades WHERE pair_id = ? " .
                     "AND date BETWEEN date(?, '-13 day') AND ? ORDER BY date DESC, id DESC";
             } else {
-                $sql = "SELECT date, type FROM trades WHERE pair_id = ? " .
+                $sql = "SELECT id, date, type FROM trades WHERE pair_id = ? " .
                     "AND date BETWEEN DATE_SUB(?, INTERVAL 13 DAY) AND ? ORDER BY date DESC, id DESC";
             }
 
@@ -104,6 +104,22 @@ function handle_trades(?array $data): array {
             return ['success' => true, 'trades' => $trades];
         } catch (Exception $e) {
             debug_log('Error fetching trades: ' . $e->getMessage());
+            return ['success' => false, 'error' => 'Database error. Please try again later.'];
+        }
+    }
+
+    if ($data['action'] === 'remove') {
+        try {
+            $id = (int)($data['id'] ?? 0);
+            $stmt = $pdo->prepare("DELETE FROM trades WHERE id = ?");
+            $stmt->execute([$id]);
+            if ($stmt->rowCount() === 0) {
+                debug_log("Trade not found: $id");
+                return ['success' => false, 'error' => 'Trade not found'];
+            }
+            return ['success' => true];
+        } catch (Exception $e) {
+            debug_log('Error deleting trade: ' . $e->getMessage());
             return ['success' => false, 'error' => 'Database error. Please try again later.'];
         }
     }
