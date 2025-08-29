@@ -141,12 +141,18 @@ if ($pair_ids) {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ action: 'add', pair_id, type, date, csrf_token: csrfToken })
-                }).then(r => r.json()).then(data => {
+                })
+                .then(r => r.json())
+                .then(data => {
                     if (data.success) {
                         tr.querySelector('.' + type).textContent = data.count;
                     } else {
                         alert('Error: ' + data.error);
                     }
+                })
+                .catch(err => {
+                    console.error('Fetch error:', err);
+                    alert('An error occurred while communicating with the server. Please try again later.');
                 });
             });
         });
