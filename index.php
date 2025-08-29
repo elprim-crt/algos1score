@@ -59,12 +59,23 @@ $stats = [];
 if ($pair_ids) {
     $in = implode(',', array_fill(0, count($pair_ids), '?'));
     try {
-        $stmt = $pdo->prepare("SELECT pair_id, \
-        SUM(type='positive') as positive, \
-        SUM(type='negative') as negative \
-        FROM trades \
-        WHERE pair_id IN ($in) AND date BETWEEN DATE_SUB(?, INTERVAL 13 DAY) AND ? \
-        GROUP BY pair_id");
+        $driver = DB_DSN ? explode(':', DB_DSN, 2)[0] : 'mysql';
+        if ($driver === 'sqlite') {
+            $sql = "SELECT pair_id, " .
+                "SUM(type='positive') as positive, " .
+                "SUM(type='negative') as negative " .
+                "FROM trades " .
+                "WHERE pair_id IN ($in) AND date BETWEEN date(?, '-13 day') AND ? " .
+                "GROUP BY pair_id";
+        } else {
+            $sql = "SELECT pair_id, " .
+                "SUM(type='positive') as positive, " .
+                "SUM(type='negative') as negative " .
+                "FROM trades " .
+                "WHERE pair_id IN ($in) AND date BETWEEN DATE_SUB(?, INTERVAL 13 DAY) AND ? " .
+                "GROUP BY pair_id";
+        }
+        $stmt = $pdo->prepare($sql);
         $stmt->execute(array_merge($pair_ids, [$selected_date, $selected_date]));
         foreach ($stmt as $row) {
             $stats[$row['pair_id']] = $row;

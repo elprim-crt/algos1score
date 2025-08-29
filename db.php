@@ -23,9 +23,11 @@ function &pdo_instance() {
 function get_db() {
     $pdo = &pdo_instance();
     if (!$pdo) {
-        $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4';
+        $dsn = DB_DSN ?: 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4';
+        $user = DB_DSN ? null : DB_USER;
+        $pass = DB_DSN ? null : DB_PASS;
         try {
-            $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+            $pdo = new PDO($dsn, $user, $pass, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             ]);
             debug_log('Database connection established');
