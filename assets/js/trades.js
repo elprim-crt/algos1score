@@ -30,13 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.querySelectorAll('button.view-trades').forEach(btn => {
-        btn.addEventListener('click', e => {
-            e.preventDefault();
-            const tr = btn.closest('tr');
+    document.querySelectorAll('a.view-trades').forEach(link => {
+        link.addEventListener('click', e => {
+            const tr = link.closest('tr');
             const pair_id = tr.getAttribute('data-pair-id');
             const date = document.getElementById('date').value;
-            window.location.href = `trades_view.php?pair_id=${encodeURIComponent(pair_id)}&date=${encodeURIComponent(date)}`;
+            link.href = `trades_view.php?pair_id=${encodeURIComponent(pair_id)}&date=${encodeURIComponent(date)}`;
         });
     });
 });
