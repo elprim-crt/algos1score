@@ -104,7 +104,9 @@ close_db(); // typically at script shutdown or after a long-running job
 
 ## Debug Logging
 
-The `App\Debug\debug_log()` helper writes messages to `debug.log` in the project root. Each entry includes a timestamp.
+The `App\Debug\debug_log()` helper collects messages in memory and writes them
+to `debug.log` at script shutdown. Each entry includes a timestamp. Messages are
+also forwarded to the system logger (syslog) immediately when available.
 
 To record a message:
 
@@ -116,7 +118,7 @@ use function App\Debug\debug_log;
 debug_log('Something happened');
 ```
 
-To watch log output in real time:
+To watch buffered log output in real time:
 
 ```bash
 tail -f debug.log
@@ -128,7 +130,16 @@ Each log entry looks like:
 [2025-08-30 12:34:56] Something happened
 ```
 
-Use these timestamps and messages to trace application flow and troubleshoot issues.
+### Performance Trade-offs
+
+Buffered logging reduces the number of file writes, which can improve
+performance on busy systems. Forwarding to syslog allows the operating system to
+handle log persistence asynchronously. However, messages may not appear in
+`debug.log` until the script exits, and they could be lost if the process ends
+abruptly or if the system logger is unavailable.
+
+Use these timestamps and messages to trace application flow and troubleshoot
+issues.
 
 ## License
 
