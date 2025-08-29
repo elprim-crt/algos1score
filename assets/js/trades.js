@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         td.addEventListener('click', () => {
             const tr = td.parentElement;
             const drawer = tr.nextElementSibling;
+            const cell = drawer.querySelector('.trades-cell');
             const pair_id = tr.getAttribute('data-pair-id');
             const date = document.getElementById('date').value;
 
@@ -41,7 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+
+            drawer.style.display = 'table-row';
+
             if (!drawer.dataset.loaded) {
+                cell.textContent = 'Loading…';
+
                 fetch('trades.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -50,25 +56,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(r => r.json())
                 .then(data => {
                     if (data.success) {
-                        const ul = document.createElement('ul');
-                        data.trades.forEach(t => {
-                            const li = document.createElement('li');
-                            li.textContent = `${t.date} - ${t.type}`;
-                            ul.appendChild(li);
-                        });
-                        drawer.querySelector('.trades-cell').appendChild(ul);
+                        if (data.trades.length === 0) {
+                            cell.textContent = 'No trades in this period.';
+                        } else {
+                            const ul = document.createElement('ul');
+                            data.trades.forEach(t => {
+                                const li = document.createElement('li');
+                                li.textContent = `${t.date} - ${t.type}`;
+                                ul.appendChild(li);
+                            });
+                            cell.innerHTML = '';
+                            cell.appendChild(ul);
+                        }
                         drawer.dataset.loaded = 'true';
                     } else {
-                        alert('Error: ' + data.error);
+                        cell.textContent = 'Error: ' + data.error;
                     }
-                    drawer.style.display = 'table-row';
                 })
                 .catch(err => {
                     console.error('Fetch error:', err);
-                    alert('An error occurred while communicating with the server. Please try again later.');
+                    cell.textContent = 'An error occurred while communicating with the server. Please try again later.';
                 });
-            } else {
-                drawer.style.display = 'table-row';
             }
         });
     });
