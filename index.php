@@ -13,7 +13,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_pair'])) {
         $error_message = 'Invalid CSRF token.';
     } else {
         $new_pair = trim($_POST['new_pair']);
-        if ($new_pair !== '') {
+        // Validate pair: 1-20 characters, alphanumeric, underscore or hyphen
+        if (!preg_match('/^[A-Za-z0-9_-]{1,20}$/', $new_pair)) {
+            $error_message = 'Invalid trading pair. Use 1-20 letters, numbers, hyphens, or underscores.';
+        } else {
             try {
                 $pdo = get_db();
                 $stmt = $pdo->prepare("INSERT IGNORE INTO pairs (name) VALUES (?)");
