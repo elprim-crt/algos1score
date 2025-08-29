@@ -130,34 +130,6 @@ if ($pair_ids) {
             <?php endforeach ?>
         </tbody>
     </table>
-    <script>
-        const csrfToken = '<?= $csrf_token ?>';
-        document.querySelectorAll('button.plus, button.minus').forEach(function(btn){
-            btn.addEventListener('click', function(e){
-                e.preventDefault();
-                let tr = btn.closest('tr');
-                let pair_id = tr.getAttribute('data-pair-id');
-                let type = btn.getAttribute('data-type');
-                let date = document.getElementById('date').value;
-                fetch('trades.php', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ action: 'add', pair_id, type, date, csrf_token: csrfToken })
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        tr.querySelector('.' + type).textContent = data.count;
-                    } else {
-                        alert('Error: ' + data.error);
-                    }
-                })
-                .catch(err => {
-                    console.error('Fetch error:', err);
-                    alert('An error occurred while communicating with the server. Please try again later.');
-                });
-            });
-        });
-    </script>
+    <script src="assets/js/trades.js"></script>
 </body>
 </html>
