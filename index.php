@@ -91,6 +91,23 @@ if ($pair_ids) {
         $error_message = $error_message ?? 'An error occurred while retrieving data. Please try again later.';
     }
 }
+
+// Fetch trades for the selected date
+$trades = [];
+if (isset($pdo)) {
+    try {
+        $stmt = $pdo->prepare(
+            "SELECT t.id, t.type, p.name AS pair_name " .
+            "FROM trades t JOIN pairs p ON t.pair_id = p.id " .
+            "WHERE t.date = ? ORDER BY t.id DESC"
+        );
+        $stmt->execute([$selected_date]);
+        $trades = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        debug_log('Error fetching trades: ' . $e->getMessage());
+        $error_message = $error_message ?? 'An error occurred while retrieving trades. Please try again later.';
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -103,6 +120,7 @@ if ($pair_ids) {
         th, td { padding: 0.5em 1em; border: 1px solid #ccc; }
         button.plus { color: #fff; background: #4caf50; border: none; padding: 0.3em 1em; cursor: pointer; }
         button.minus { color: #fff; background: #f44336; border: none; padding: 0.3em 1em; cursor: pointer; }
+        button.remove-trade { color: #fff; background: #f44336; border: none; padding: 0.3em 0.7em; cursor: pointer; }
         form.inline { display: inline; }
     </style>
 </head>
@@ -151,6 +169,31 @@ if ($pair_ids) {
             <?php endforeach ?>
         </tbody>
     </table>
+
+    <h2>Trades on <?= htmlspecialchars($selected_date) ?></h2>
+    <?php if (empty($trades)): ?>
+        <p>No trades on this date.</p>
+    <?php else: ?>
+        <table>
+            <thead>
+                <tr>
+                    <th>Pair</th>
+                    <th>Type</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tradesTable">
+                <?php foreach ($trades as $t): ?>
+                <tr data-trade-id="<?= (int)$t['id'] ?>">
+                    <td><?= htmlspecialchars(strtoupper($t['pair_name'])) ?></td>
+                    <td><?= htmlspecialchars($t['type']) ?></td>
+                    <td><button class="remove-trade" data-id="<?= (int)$t['id'] ?>">Remove</button></td>
+                </tr>
+                <?php endforeach ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+
     <script src="assets/js/trades.js?v=<?= filemtime('assets/js/trades.js') ?>"></script>
 </body>
 </html>

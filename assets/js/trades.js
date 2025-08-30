@@ -55,6 +55,32 @@ const init = () => {
             link.href = `trades_view.php?pair_id=${encodeURIComponent(pair_id)}&date=${encodeURIComponent(date)}`;
         });
     });
+
+    document.querySelectorAll('#tradesTable .remove-trade').forEach(btn => {
+        btn.addEventListener('click', e => {
+            e.preventDefault();
+            const tr = btn.closest('tr');
+            const id = btn.getAttribute('data-id');
+            fetch('trades.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'remove', id, csrf_token: csrfToken }),
+                credentials: 'same-origin'
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    tr.remove();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(err => {
+                console.error('Fetch error:', err);
+                alert('An error occurred while communicating with the server. Please try again later.');
+            });
+        });
+    });
 };
 
 if (document.readyState === 'loading') {
