@@ -42,6 +42,10 @@ class IndexPageTest extends TestCase
         $this->assertMatchesRegularExpression('/<td class="negative">\s*1\s*<\/td>/', $output);
         $this->assertStringContainsString('name="csrf_token" value="'.htmlspecialchars($token, ENT_QUOTES).'"', $output);
         $this->assertStringContainsString('<a class="view-trades" href="trades_view.php?pair_id=1&amp;date=2024-01-02">Trades</a>', $output);
+        $this->assertStringContainsString('Trades on 2024-01-02', $output);
+        $this->assertStringContainsString('<td>BTCUSD</td>', $output);
+        $this->assertStringContainsString('<td>positive</td>', $output);
+        $this->assertStringContainsString('class="remove-trade"', $output);
     }
 
     public function testAddingPairCapitalizesName(): void
