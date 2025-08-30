@@ -79,6 +79,6 @@ if (!$error_message) {
         <input type="hidden" id="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
     <?php endif; ?>
     <p><a href="index.php?date=<?= htmlspecialchars($date) ?>">Back to main page</a></p>
-    <script src="assets/js/trades_view.js"></script>
+    <script src="assets/js/trades_view.js?v=<?= filemtime('assets/js/trades_view.js') ?>"></script>
 </body>
 </html>
