@@ -114,18 +114,12 @@ if (isset($pdo)) {
 <head>
     <meta charset="UTF-8">
     <title>Trading Pairs Stats</title>
-    <style>
-        body { font-family: sans-serif; margin: 2em; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { padding: 0.5em 1em; border: 1px solid #ccc; }
-        button.plus { color: #fff; background: #4caf50; border: none; padding: 0.3em 1em; cursor: pointer; }
-        button.minus { color: #fff; background: #f44336; border: none; padding: 0.3em 1em; cursor: pointer; }
-        button.remove-trade { color: #fff; background: #f44336; border: none; padding: 0.3em 0.7em; cursor: pointer; }
-        form.inline { display: inline; }
-    </style>
+    <link rel="stylesheet" href="assets/css/style.css?v=<?= filemtime('assets/css/style.css') ?>">
 </head>
 <body>
-    <h2>Trading Pairs - Last 14 Days</h2>
+    <div class="responsive-wrapper">
+        <div class="pairs-wrapper">
+            <h2>Trading Pairs - Last 14 Days</h2>
     <?php if ($error_message): ?>
         <p style="color:red;"><?= htmlspecialchars($error_message) ?></p>
     <?php endif; ?>
@@ -169,8 +163,10 @@ if (isset($pdo)) {
             <?php endforeach ?>
         </tbody>
     </table>
+        </div>
 
-    <h2>Trades on <?= htmlspecialchars($selected_date) ?></h2>
+        <div class="trades-wrapper">
+            <h2>Trades on <?= htmlspecialchars($selected_date) ?></h2>
     <?php if (empty($trades)): ?>
         <p>No trades on this date.</p>
     <?php else: ?>
@@ -193,6 +189,8 @@ if (isset($pdo)) {
             </tbody>
         </table>
     <?php endif; ?>
+        </div>
+    </div>
 
     <script src="assets/js/trades.js?v=<?= filemtime('assets/js/trades.js') ?>"></script>
 </body>
