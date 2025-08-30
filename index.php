@@ -166,7 +166,7 @@ if (isset($pdo)) {
         </div>
 
         <div class="trades-wrapper">
-            <h2>Trades on <?= htmlspecialchars($selected_date) ?></h2>
+            <h2>Trades on <?= htmlspecialchars($selected_date) ?></h2></br></br>
     <?php if (empty($trades)): ?>
         <p>No trades on this date.</p>
     <?php else: ?>
