@@ -48,12 +48,7 @@ if (!$error_message) {
 <head>
     <meta charset="UTF-8">
     <title>Trades</title>
-    <style>
-        body { font-family: sans-serif; margin: 2em; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { padding: 0.5em 1em; border: 1px solid #ccc; }
-        button.remove-trade { color: #fff; background: #f44336; border: none; padding: 0.3em 0.7em; cursor: pointer; }
-    </style>
+    <link rel="stylesheet" href="assets/css/style.css?v=<?= filemtime('assets/css/style.css') ?>">
 </head>
 <body>
     <h2>Trades for <?= htmlspecialchars(strtoupper($pair_name)) ?> - Last 14 Days</h2>
