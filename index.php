@@ -151,6 +151,6 @@ if ($pair_ids) {
             <?php endforeach ?>
         </tbody>
     </table>
-    <script src="assets/js/trades.js"></script>
+    <script src="assets/js/trades.js?v=<?= filemtime('assets/js/trades.js') ?>"></script>
 </body>
 </html>
