@@ -7,9 +7,13 @@ namespace App\Debug;
  *
  * Messages are queued in memory and flushed to debug.log at script shutdown
  * to reduce I/O overhead. Each message is also sent to the system logger
- * (syslog) immediately when available.
+ * (syslog) immediately when available. Logging can be disabled by setting
+ * `DEBUG_LOG_ENABLED` to false in config.php.
  */
 function debug_log($message): void {
+    if (defined('DEBUG_LOG_ENABLED') && !DEBUG_LOG_ENABLED) {
+        return;
+    }
     static $buffer = [];
     static $registered = false;
     static $syslogOpened = false;

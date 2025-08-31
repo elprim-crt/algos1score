@@ -108,6 +108,9 @@ The `App\Debug\debug_log()` helper collects messages in memory and writes them
 to `debug.log` at script shutdown. Each entry includes a timestamp. Messages are
 also forwarded to the system logger (syslog) immediately when available.
 
+Debug logging is enabled by default. To turn it off, set `DEBUG_LOG_ENABLED`
+to `false` in `config.php` or via the `DEBUG_LOG_ENABLED` environment variable.
+
 To record a message:
 
 ```php
