@@ -65,6 +65,52 @@ class TradesApiTest extends TestCase
         $this->assertSame(2, $duplicate['count']);
     }
 
+    public function testAddTradeMissingTypeReturnsError(): void
+    {
+        $payload = [
+            'action' => 'add',
+            'pair_id' => 1,
+            'date' => '2024-01-01',
+            'csrf_token' => $this->csrfToken,
+        ];
+
+        $response = handle_trades($payload);
+
+        $this->assertFalse($response['success']);
+        $this->assertSame('Missing type', $response['error']);
+    }
+
+    public function testAddTradeMissingDateReturnsError(): void
+    {
+        $payload = [
+            'action' => 'add',
+            'pair_id' => 1,
+            'type' => 'positive',
+            'csrf_token' => $this->csrfToken,
+        ];
+
+        $response = handle_trades($payload);
+
+        $this->assertFalse($response['success']);
+        $this->assertSame('Missing date', $response['error']);
+    }
+
+    public function testAddTradeInvalidDateReturnsError(): void
+    {
+        $payload = [
+            'action' => 'add',
+            'pair_id' => 1,
+            'type' => 'positive',
+            'date' => '2024-02-30',
+            'csrf_token' => $this->csrfToken,
+        ];
+
+        $response = handle_trades($payload);
+
+        $this->assertFalse($response['success']);
+        $this->assertSame('Invalid date format', $response['error']);
+    }
+
     public function testListTrades(): void
     {
         $payload = [
@@ -90,6 +136,31 @@ class TradesApiTest extends TestCase
         $types = array_column($list['trades'], 'type');
         $this->assertContains('positive', $types);
         $this->assertContains('negative', $types);
+    }
+
+    public function testListTradesMissingDateReturnsError(): void
+    {
+        $response = handle_trades([
+            'action' => 'list',
+            'pair_id' => 1,
+            'csrf_token' => $this->csrfToken,
+        ]);
+
+        $this->assertFalse($response['success']);
+        $this->assertSame('Missing date', $response['error']);
+    }
+
+    public function testListTradesInvalidDateReturnsError(): void
+    {
+        $response = handle_trades([
+            'action' => 'list',
+            'pair_id' => 1,
+            'date' => '2024-02-30',
+            'csrf_token' => $this->csrfToken,
+        ]);
+
+        $this->assertFalse($response['success']);
+        $this->assertSame('Invalid date format', $response['error']);
     }
 
     public function testRemoveTrade(): void

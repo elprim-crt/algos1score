@@ -54,8 +54,33 @@ function handle_trades(?array $data): array {
     if ($data['action'] === 'add') {
         try {
             $pair_id = (int)($data['pair_id'] ?? 0);
+
+            if (!array_key_exists('type', $data) || !is_string($data['type']) || trim($data['type']) === '') {
+                debug_log('Missing type');
+                return ['success' => false, 'error' => 'Missing type'];
+            }
             $type = $data['type'];
+
+            if (!array_key_exists('date', $data) || !is_string($data['date']) || trim($data['date']) === '') {
+                debug_log('Missing date');
+                return ['success' => false, 'error' => 'Missing date'];
+            }
             $date = $data['date'];
+
+            $dateTime = DateTime::createFromFormat('Y-m-d', $date);
+            $dateErrors = DateTime::getLastErrors();
+            $isValidDate = $dateTime instanceof DateTimeInterface
+                && ($dateErrors === false || (($dateErrors['warning_count'] ?? 0) === 0 && ($dateErrors['error_count'] ?? 0) === 0))
+                && $dateTime->format('Y-m-d') === $date;
+            if (!$isValidDate) {
+                debug_log("Invalid date format: $date");
+                return ['success' => false, 'error' => 'Invalid date format'];
+            }
+
+            if (!in_array($type, ['positive', 'negative'], true)) {
+                debug_log("Invalid type: $type");
+                return ['success' => false, 'error' => 'Invalid type'];
+            }
 
             // Validate pair_id
             $stmt = $pdo->prepare("SELECT id FROM pairs WHERE id = ?");
@@ -63,11 +88,6 @@ function handle_trades(?array $data): array {
             if (!$stmt->fetchColumn()) {
                 debug_log("Invalid pair_id: $pair_id");
                 return ['success' => false, 'error' => 'Invalid pair_id'];
-            }
-
-            if (!in_array($type, ['positive', 'negative'])) {
-                debug_log("Invalid type: $type");
-                return ['success' => false, 'error' => 'Invalid type'];
             }
 
             // Insert trade
@@ -98,7 +118,22 @@ function handle_trades(?array $data): array {
     if ($data['action'] === 'list') {
         try {
             $pair_id = (int)($data['pair_id'] ?? 0);
+
+            if (!array_key_exists('date', $data) || !is_string($data['date']) || trim($data['date']) === '') {
+                debug_log('Missing date');
+                return ['success' => false, 'error' => 'Missing date'];
+            }
             $date = $data['date'];
+
+            $dateTime = DateTime::createFromFormat('Y-m-d', $date);
+            $dateErrors = DateTime::getLastErrors();
+            $isValidDate = $dateTime instanceof DateTimeInterface
+                && ($dateErrors === false || (($dateErrors['warning_count'] ?? 0) === 0 && ($dateErrors['error_count'] ?? 0) === 0))
+                && $dateTime->format('Y-m-d') === $date;
+            if (!$isValidDate) {
+                debug_log("Invalid date format: $date");
+                return ['success' => false, 'error' => 'Invalid date format'];
+            }
 
             // Validate pair_id
             $stmt = $pdo->prepare("SELECT id FROM pairs WHERE id = ?");
