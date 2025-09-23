@@ -12,3 +12,10 @@ form.inline { display: inline; }
 .date-controls label { font-weight: 600; }
 .date-controls .quick-date-label { font-weight: normal; }
 .date-controls select { padding: 0.3em 0.6em; }
+.trade-row { transition: background-color 0.2s ease-in-out; }
+.trade-row.trade-positive { background-color: #e6f4ea; }
+.trade-row.trade-negative { background-color: #fdecea; }
+.trade-row td:nth-child(2) { text-transform: capitalize; }
+.trade-row:hover { background-color: #fff9c4; }
+.trade-row.trade-positive td:nth-child(2) { color: #1b5e20; font-weight: 600; }
+.trade-row.trade-negative td:nth-child(2) { color: #c62828; font-weight: 600; }

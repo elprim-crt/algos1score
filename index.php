@@ -200,8 +200,11 @@ if (isset($pdo)) {
                 </tr>
             </thead>
             <tbody id="tradesTable">
-                <?php foreach ($trades as $t): ?>
-                <tr data-trade-id="<?= (int)$t['id'] ?>" data-pair-id="<?= (int)$t['pair_id'] ?>" data-type="<?= htmlspecialchars($t['type']) ?>">
+                <?php foreach ($trades as $t):
+                    $type = $t['type'] === 'positive' ? 'positive' : 'negative';
+                    $rowClass = $type === 'positive' ? 'trade-positive' : 'trade-negative';
+                ?>
+                <tr class="trade-row <?= $rowClass ?>" data-trade-id="<?= (int)$t['id'] ?>" data-pair-id="<?= (int)$t['pair_id'] ?>" data-type="<?= htmlspecialchars($t['type']) ?>">
                     <td><?= htmlspecialchars(strtoupper($t['pair_name'])) ?></td>
                     <td><?= htmlspecialchars($t['type']) ?></td>
                     <td><button class="remove-trade" data-id="<?= (int)$t['id'] ?>">Remove</button></td>

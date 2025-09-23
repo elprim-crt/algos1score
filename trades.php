@@ -140,7 +140,7 @@ function handle_trades(?array $data): array {
             }
 
             $sql = "SELECT id, date, type FROM trades WHERE pair_id = ? AND date <= ? " .
-                "ORDER BY date DESC, id DESC LIMIT 10";
+                "ORDER BY date DESC, id DESC LIMIT 20";
 
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$pair_id, $date]);
