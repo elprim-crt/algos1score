@@ -59,6 +59,16 @@ if (isset($_GET['date'])) {
     }
 }
 
+$available_dates = [];
+if (isset($pdo)) {
+    try {
+        $stmt = $pdo->query("SELECT DISTINCT date FROM trades ORDER BY date DESC LIMIT 30");
+        $available_dates = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    } catch (Exception $e) {
+        debug_log('Error fetching available dates: ' . $e->getMessage());
+    }
+}
+
 // Fetch stats for all pairs
 $pair_ids = array_column($pairs, 'id');
 $stats = [];
@@ -123,10 +133,23 @@ if (isset($pdo)) {
     <?php if ($error_message): ?>
         <p style="color:red;"><?= htmlspecialchars($error_message) ?></p>
     <?php endif; ?>
-    <form id="dateForm" method="get">
-        <label for="date">Select Date:</label>
-        <input type="date" name="date" id="date" value="<?= htmlspecialchars($selected_date) ?>" max="<?= date('Y-m-d') ?>">
-        <button type="submit">Go</button>
+    <form id="dateForm" method="get" class="date-form">
+        <div class="date-controls">
+            <label for="date">Select Date:</label>
+            <input type="date" name="date" id="date" value="<?= htmlspecialchars($selected_date) ?>" max="<?= date('Y-m-d') ?>">
+            <?php if (!empty($available_dates)): ?>
+            <label for="quickDate" class="quick-date-label">or choose recent:</label>
+            <select id="quickDate" class="quick-date">
+                <option value="">Recent dates…</option>
+                <?php foreach ($available_dates as $dateOption): ?>
+                <option value="<?= htmlspecialchars($dateOption) ?>" <?= $dateOption === $selected_date ? 'selected' : '' ?>>
+                    <?= htmlspecialchars((new DateTime($dateOption))->format('M j, Y')) ?>
+                </option>
+                <?php endforeach; ?>
+            </select>
+            <?php endif; ?>
+            <button type="submit">Go</button>
+        </div>
     </form>
     <br>
     <form method="post" class="inline" id="addPairForm" autocomplete="off">

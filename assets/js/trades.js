@@ -15,6 +15,25 @@ const init = () => {
             : `linear-gradient(to right, ${color} ${percent}%, #fff ${percent}%)`;
     };
 
+    const dateInput = document.getElementById('date');
+    const dateForm = document.getElementById('dateForm');
+    const quickDate = document.getElementById('quickDate');
+
+    if (quickDate && dateInput && dateForm) {
+        quickDate.addEventListener('change', () => {
+            const value = quickDate.value;
+            if (!value) {
+                return;
+            }
+            dateInput.value = value;
+            if (typeof dateForm.requestSubmit === 'function') {
+                dateForm.requestSubmit();
+            } else {
+                dateForm.submit();
+            }
+        });
+    }
+
     document.querySelectorAll('td.positive, td.negative').forEach(updateCellColor);
 
     document.querySelectorAll('button.plus, button.minus').forEach(btn => {
@@ -23,7 +42,7 @@ const init = () => {
             const tr = btn.closest('tr');
             const pair_id = tr.getAttribute('data-pair-id');
             const type = btn.getAttribute('data-type');
-            const date = document.getElementById('date').value;
+            const date = dateInput ? dateInput.value : '';
             fetch('trades.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -51,7 +70,7 @@ const init = () => {
         link.addEventListener('click', e => {
             const tr = link.closest('tr');
             const pair_id = tr.getAttribute('data-pair-id');
-            const date = document.getElementById('date').value;
+            const date = dateInput ? dateInput.value : '';
             link.href = `trades_view.php?pair_id=${encodeURIComponent(pair_id)}&date=${encodeURIComponent(date)}`;
         });
     });
