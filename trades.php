@@ -12,7 +12,27 @@ use function App\Debug\debug_log;
  * @return array Response array to be JSON-encoded
  */
 function handle_trades(?array $data): array {
-    debug_log(['request' => $data]);
+    $logData = $data;
+    if (is_array($logData)) {
+        $sensitiveKeys = [
+            'csrf_token',
+            'password',
+            'secret',
+            'api_key',
+            'auth_token',
+            'access_token',
+            'refresh_token',
+        ];
+
+        foreach ($logData as $key => $value) {
+            $normalizedKey = is_string($key) ? strtolower($key) : $key;
+            if (is_string($normalizedKey) && (in_array($normalizedKey, $sensitiveKeys, true) || str_contains($normalizedKey, 'token'))) {
+                $logData[$key] = '[redacted]';
+            }
+        }
+    }
+
+    debug_log(['request' => $logData]);
 
     if (!is_array($data) || !isset($data['action'])) {
         debug_log('Malformed or missing request body');
