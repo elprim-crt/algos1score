@@ -61,6 +61,8 @@ const init = () => {
             e.preventDefault();
             const tr = btn.closest('tr');
             const id = btn.getAttribute('data-id');
+            const pairId = tr ? tr.getAttribute('data-pair-id') : null;
+            const type = tr ? tr.getAttribute('data-type') : null;
             fetch('trades.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -70,6 +72,18 @@ const init = () => {
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
+                    if (pairId && type) {
+                        const pairRow = document.querySelector(`#pairsTable tr[data-pair-id="${pairId}"]`);
+                        if (pairRow) {
+                            const cell = pairRow.querySelector(type === 'negative' ? '.negative' : '.positive');
+                            if (cell) {
+                                const current = parseInt(cell.textContent, 10) || 0;
+                                const updated = Math.max(current - 1, 0);
+                                cell.textContent = updated;
+                                updateCellColor(cell);
+                            }
+                        }
+                    }
                     tr.remove();
                 } else {
                     alert('Error: ' + data.error);

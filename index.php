@@ -97,7 +97,7 @@ $trades = [];
 if (isset($pdo)) {
     try {
         $stmt = $pdo->prepare(
-            "SELECT t.id, t.type, p.name AS pair_name " .
+            "SELECT t.id, t.pair_id, t.type, p.name AS pair_name " .
             "FROM trades t JOIN pairs p ON t.pair_id = p.id " .
             "WHERE t.date = ? ORDER BY t.id DESC"
         );
@@ -180,7 +180,7 @@ if (isset($pdo)) {
             </thead>
             <tbody id="tradesTable">
                 <?php foreach ($trades as $t): ?>
-                <tr data-trade-id="<?= (int)$t['id'] ?>">
+                <tr data-trade-id="<?= (int)$t['id'] ?>" data-pair-id="<?= (int)$t['pair_id'] ?>" data-type="<?= htmlspecialchars($t['type']) ?>">
                     <td><?= htmlspecialchars(strtoupper($t['pair_name'])) ?></td>
                     <td><?= htmlspecialchars($t['type']) ?></td>
                     <td><button class="remove-trade" data-id="<?= (int)$t['id'] ?>">Remove</button></td>
