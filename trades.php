@@ -95,18 +95,14 @@ function handle_trades(?array $data): array {
             $stmt->execute([$pair_id, $date, $type]);
             debug_log("Inserted trade pair_id=$pair_id type=$type date=$date");
 
-            // Return updated count for this type and pair in the last 14 days
-            $driver = DB_DSN ? explode(':', DB_DSN, 2)[0] : 'mysql';
-            if ($driver === 'sqlite') {
-                $sql = "SELECT COUNT(*) FROM trades WHERE pair_id = ? AND type = ? " .
-                    "AND date BETWEEN date(?, '-13 day') AND ?";
-            } else {
-                $sql = "SELECT COUNT(*) FROM trades WHERE pair_id = ? AND type = ? " .
-                    "AND date BETWEEN DATE_SUB(?, INTERVAL 13 DAY) AND ?";
-            }
+            // Return updated count for this type within the last 10 trades up to the provided date
+            $sql = "SELECT SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) FROM (" .
+                "SELECT type FROM trades WHERE pair_id = ? AND date <= ? " .
+                "ORDER BY date DESC, id DESC LIMIT 10" .
+                ") recent";
             $stmt2 = $pdo->prepare($sql);
-            $stmt2->execute([$pair_id, $type, $date, $date]);
-            $count = $stmt2->fetchColumn();
+            $stmt2->execute([$type, $pair_id, $date]);
+            $count = (int)($stmt2->fetchColumn() ?: 0);
 
             return ['success' => true, 'count' => $count];
         } catch (Exception $e) {
@@ -143,17 +139,11 @@ function handle_trades(?array $data): array {
                 return ['success' => false, 'error' => 'Invalid pair_id'];
             }
 
-            $driver = DB_DSN ? explode(':', DB_DSN, 2)[0] : 'mysql';
-            if ($driver === 'sqlite') {
-                $sql = "SELECT id, date, type FROM trades WHERE pair_id = ? " .
-                    "AND date BETWEEN date(?, '-13 day') AND ? ORDER BY date DESC, id DESC";
-            } else {
-                $sql = "SELECT id, date, type FROM trades WHERE pair_id = ? " .
-                    "AND date BETWEEN DATE_SUB(?, INTERVAL 13 DAY) AND ? ORDER BY date DESC, id DESC";
-            }
+            $sql = "SELECT id, date, type FROM trades WHERE pair_id = ? AND date <= ? " .
+                "ORDER BY date DESC, id DESC LIMIT 10";
 
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$pair_id, $date, $date]);
+            $stmt->execute([$pair_id, $date]);
             $trades = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             return ['success' => true, 'trades' => $trades];

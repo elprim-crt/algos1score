@@ -26,16 +26,10 @@ try {
 $trades = [];
 if (!$error_message) {
     try {
-        $driver = DB_DSN ? explode(':', DB_DSN, 2)[0] : 'mysql';
-        if ($driver === 'sqlite') {
-            $sql = "SELECT id, date, type FROM trades WHERE pair_id = ? " .
-                "AND date BETWEEN date(?, '-13 day') AND ? ORDER BY date DESC, id DESC";
-        } else {
-            $sql = "SELECT id, date, type FROM trades WHERE pair_id = ? " .
-                "AND date BETWEEN DATE_SUB(?, INTERVAL 13 DAY) AND ? ORDER BY date DESC, id DESC";
-        }
+        $sql = "SELECT id, date, type FROM trades WHERE pair_id = ? AND date <= ? " .
+            "ORDER BY date DESC, id DESC LIMIT 10";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$pair_id, $date, $date]);
+        $stmt->execute([$pair_id, $date]);
         $trades = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         debug_log('Error fetching trades: ' . $e->getMessage());
@@ -51,7 +45,7 @@ if (!$error_message) {
     <link rel="stylesheet" href="assets/css/style.css?v=<?= filemtime('assets/css/style.css') ?>">
 </head>
 <body>
-    <h2>Trades for <?= htmlspecialchars(strtoupper($pair_name)) ?> - Last 14 Days</h2>
+    <h2>Trades for <?= htmlspecialchars(strtoupper($pair_name)) ?> - Last 10 Trades</h2>
     <?php if ($error_message): ?>
         <p style="color:red;"><?= htmlspecialchars($error_message) ?></p>
     <?php elseif (empty($trades)): ?>

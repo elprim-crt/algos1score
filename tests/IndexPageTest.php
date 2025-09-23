@@ -36,7 +36,7 @@ class IndexPageTest extends TestCase
         ob_start();
         include __DIR__ . '/../index.php';
         $output = ob_get_clean();
-        $this->assertStringContainsString('Trading Pairs - Last 14 Days', $output);
+        $this->assertStringContainsString('Trading Pairs - Last 10 Trades', $output);
         $this->assertStringContainsString('BTCUSD', $output);
         $this->assertMatchesRegularExpression('/<td class="positive">\s*2\s*<\/td>/', $output);
         $this->assertMatchesRegularExpression('/<td class="negative">\s*1\s*<\/td>/', $output);

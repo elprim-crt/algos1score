@@ -69,36 +69,34 @@ if (isset($pdo)) {
     }
 }
 
-// Fetch stats for all pairs
-$pair_ids = array_column($pairs, 'id');
+// Fetch stats for all pairs based on their last 10 trades up to the selected date
 $stats = [];
-if ($pair_ids) {
-    $in = implode(',', array_fill(0, count($pair_ids), '?'));
+if (!empty($pairs) && isset($pdo)) {
     try {
-        $driver = DB_DSN ? explode(':', DB_DSN, 2)[0] : 'mysql';
-        if ($driver === 'sqlite') {
-            $sql = "SELECT pair_id, " .
-                "SUM(type='positive') as positive, " .
-                "SUM(type='negative') as negative " .
-                "FROM trades " .
-                "WHERE pair_id IN ($in) AND date BETWEEN date(?, '-13 day') AND ? " .
-                "GROUP BY pair_id";
-        } else {
-            $sql = "SELECT pair_id, " .
-                "SUM(type='positive') as positive, " .
-                "SUM(type='negative') as negative " .
-                "FROM trades " .
-                "WHERE pair_id IN ($in) AND date BETWEEN DATE_SUB(?, INTERVAL 13 DAY) AND ? " .
-                "GROUP BY pair_id";
-        }
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(array_merge($pair_ids, [$selected_date, $selected_date]));
-        foreach ($stmt as $row) {
-            $stats[$row['pair_id']] = $row;
+        $stmt = $pdo->prepare(
+            "SELECT type FROM trades WHERE pair_id = ? AND date <= ? ORDER BY date DESC, id DESC LIMIT 10"
+        );
+        foreach ($pairs as $pair) {
+            $pid = $pair['id'];
+            $stats[$pid] = [
+                'pair_id' => $pid,
+                'positive' => 0,
+                'negative' => 0,
+            ];
+            $stmt->execute([$pid, $selected_date]);
+            $types = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            foreach ($types as $type) {
+                if ($type === 'positive') {
+                    $stats[$pid]['positive']++;
+                } elseif ($type === 'negative') {
+                    $stats[$pid]['negative']++;
+                }
+            }
+            $stmt->closeCursor();
         }
     } catch (Exception $e) {
         debug_log('Error fetching stats: ' . $e->getMessage());
-        $error_message = $error_message ?? 'An error occurred while retrieving data. Please try again later.';
+        $error_message = $error_message ?? 'An error occurred while retrieving trade statistics. Please try again later.';
     }
 }
 
@@ -129,7 +127,7 @@ if (isset($pdo)) {
 <body>
     <div class="responsive-wrapper">
         <div class="pairs-wrapper">
-            <h2>Trading Pairs - Last 14 Days</h2>
+            <h2>Trading Pairs - Last 10 Trades</h2>
     <?php if ($error_message): ?>
         <p style="color:red;"><?= htmlspecialchars($error_message) ?></p>
     <?php endif; ?>
