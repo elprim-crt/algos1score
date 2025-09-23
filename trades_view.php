@@ -27,7 +27,7 @@ $trades = [];
 if (!$error_message) {
     try {
         $sql = "SELECT id, date, type FROM trades WHERE pair_id = ? AND date <= ? " .
-            "ORDER BY date DESC, id DESC LIMIT 10";
+            "ORDER BY date DESC, id DESC LIMIT 20";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$pair_id, $date]);
         $trades = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -45,7 +45,7 @@ if (!$error_message) {
     <link rel="stylesheet" href="assets/css/style.css?v=<?= filemtime('assets/css/style.css') ?>">
 </head>
 <body>
-    <h2>Trades for <?= htmlspecialchars(strtoupper($pair_name)) ?> - Last 10 Trades</h2>
+    <h2>Trades for <?= htmlspecialchars(strtoupper($pair_name)) ?> - Last 20 Trades</h2>
     <?php if ($error_message): ?>
         <p style="color:red;"><?= htmlspecialchars($error_message) ?></p>
     <?php elseif (empty($trades)): ?>
@@ -56,8 +56,11 @@ if (!$error_message) {
                 <tr><th>Date</th><th>Type</th><th>Action</th></tr>
             </thead>
             <tbody>
-                <?php foreach ($trades as $t): ?>
-                <tr data-trade-id="<?= (int)$t['id'] ?>">
+                <?php foreach ($trades as $t):
+                    $type = $t['type'] === 'positive' ? 'positive' : 'negative';
+                    $rowClass = $type === 'positive' ? 'trade-positive' : 'trade-negative';
+                ?>
+                <tr class="trade-row <?= $rowClass ?>" data-trade-id="<?= (int)$t['id'] ?>">
                     <td><?= htmlspecialchars($t['date']) ?></td>
                     <td><?= htmlspecialchars($t['type']) ?></td>
                     <td><button class="remove-trade" data-id="<?= (int)$t['id'] ?>">Remove</button></td>
