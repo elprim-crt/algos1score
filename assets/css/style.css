@@ -7,3 +7,8 @@ button.remove-trade { color: #fff; background: #f44336; border: none; padding: 0
 form.inline { display: inline; }
 .responsive-wrapper { display: flex; flex-direction: column; gap: 2em; }
 @media (min-width: 768px) { .responsive-wrapper { flex-direction: row; } .responsive-wrapper > div { flex: 1; } }
+.date-form { margin-bottom: 1em; }
+.date-controls { display: flex; flex-wrap: wrap; gap: 0.5em; align-items: center; }
+.date-controls label { font-weight: 600; }
+.date-controls .quick-date-label { font-weight: normal; }
+.date-controls select { padding: 0.3em 0.6em; }
