@@ -172,13 +172,16 @@ if (isset($pdo)) {
                 $neg = $stats[$pid]['negative'] ?? 0;
             ?>
             <tr data-pair-id="<?= (int)$pid ?>" class="pair-row">
-                <td class="pair-name"><?= htmlspecialchars(strtoupper($pair['name'])) ?></td>
+                <td class="pair-name">
+                    <a href="<?= htmlspecialchars('trades_view.php?pair_id=' . (int)$pid . '&date=' . $selected_date) ?>">
+                        <?= htmlspecialchars(strtoupper($pair['name'])) ?>
+                    </a>
+                </td>
                 <td class="positive"><?= $pos ?></td>
                 <td class="negative"><?= $neg ?></td>
                 <td>
                     <button class="plus" data-type="positive">+</button>
                     <button class="minus" data-type="negative">-</button>
-                    <a class="view-trades" href="<?= htmlspecialchars('trades_view.php?pair_id=' . (int)$pid . '&date=' . $selected_date) ?>">Trades</a>
                 </td>
             </tr>
             <?php endforeach ?>
