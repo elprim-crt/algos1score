@@ -5,7 +5,7 @@ A lightweight PHP-based backend for recording and reporting trades with positive
 ## Features
 
 - **Add Trades:** Record trades for specific pairs with type (`positive` or `negative`) and date.
-- **14-Day Reporting:** Get the count of positive or negative trades per pair for the last 14 days.
+- **Last 10 Trades Reporting:** Get the count of positive or negative trades per pair based on their most recent 10 trades.
 - **RESTful API:** Simple POST-based API for integration.
 - **CSRF Protection:** All POST requests require a valid CSRF token stored in the user session.
 
@@ -41,7 +41,7 @@ A lightweight PHP-based backend for recording and reporting trades with positive
   "count": 2
 }
 ```
-Returns the updated count for the specified type and pair in the last 14 days.
+Returns the updated count for the specified type and pair within its last 10 trades up to the submitted date.
 
 ### Errors
 
